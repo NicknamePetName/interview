@@ -239,6 +239,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     public Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest) {
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
+        questionQueryRequest.setTitle(StringUtils.isNotBlank(questionQueryRequest.getTitle()) ? questionQueryRequest.getTitle().strip() : null);
         QueryWrapper<Question> queryWrapper = this.getQueryWrapper(questionQueryRequest);
         // 根据题库查询题目列表接口
         Long questionBankId = questionQueryRequest.getQuestionBankId();

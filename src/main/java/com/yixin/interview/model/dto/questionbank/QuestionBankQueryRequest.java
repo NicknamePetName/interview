@@ -26,6 +26,11 @@ public class QuestionBankQueryRequest extends PageRequest implements Serializabl
     private Long notId;
 
     /**
+     * 标题
+     */
+    private String title;
+
+    /**
      * 搜索词
      */
     private String searchText;

@@ -7,7 +7,9 @@ import com.yixin.interview.constant.CommonConstant;
 import com.yixin.interview.constant.UserConstant;
 import com.yixin.interview.exception.BusinessException;
 import com.yixin.interview.common.ErrorCode;
+import com.yixin.interview.exception.ThrowUtils;
 import com.yixin.interview.mapper.UserMapper;
+import com.yixin.interview.model.dto.user.UserAddRequest;
 import com.yixin.interview.model.dto.user.UserQueryRequest;
 import com.yixin.interview.model.entity.User;
 import com.yixin.interview.model.enums.UserRoleEnum;
@@ -15,10 +17,12 @@ import com.yixin.interview.model.vo.LoginUserVO;
 import com.yixin.interview.model.vo.UserVO;
 import com.yixin.interview.service.UserService;
 import com.yixin.interview.utils.SqlUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +32,6 @@ import org.springframework.util.DigestUtils;
 
 /**
  * 用户服务实现
- *
  */
 @Service
 @Slf4j
@@ -37,7 +40,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     /**
      * 盐值，混淆密码
      */
-    public static final String SALT = "yupi";
+    public static final String SALT = "yixin";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -253,17 +256,51 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String userName = userQueryRequest.getUserName();
         String userProfile = userQueryRequest.getUserProfile();
         String userRole = userQueryRequest.getUserRole();
+        String userAccount = userQueryRequest.getUserAccount();
         String sortField = userQueryRequest.getSortField();
         String sortOrder = userQueryRequest.getSortOrder();
+
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(id != null, "id", id);
         queryWrapper.eq(StringUtils.isNotBlank(unionId), "unionId", unionId);
         queryWrapper.eq(StringUtils.isNotBlank(mpOpenId), "mpOpenId", mpOpenId);
         queryWrapper.eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
-        queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
-        queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName);
+        queryWrapper.eq(StringUtils.isNotBlank(userAccount), "userAccount", userAccount != null ? userAccount.strip() : null);
+        queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile !=null ? userProfile.strip() : null);
+        queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName != null ? userName.strip() : null);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
+    }
+
+    @Override
+    public Long userAdd(UserAddRequest userAddRequest) {
+        // 1. 校验
+        if (StringUtils.isAnyBlank(userAddRequest.getUserAccount())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号不能为空");
+        }
+        if (userAddRequest.getUserAccount().length() < 4) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
+        }
+        userAddRequest.setUserAccount(userAddRequest.getUserAccount().trim());
+        userAddRequest.setUserName(userAddRequest.getUserName() != null ? userAddRequest.getUserName().strip() : null);
+        userAddRequest.setUserAvatar(userAddRequest.getUserAvatar() != null ? userAddRequest.getUserAvatar().strip() : null);
+        userAddRequest.setUserProfile(userAddRequest.getUserProfile() != null ? userAddRequest.getUserProfile().strip() : null);
+        User user = new User();
+        BeanUtils.copyProperties(userAddRequest, user);
+        // 账户不能重复
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userAddRequest.getUserAccount());
+        long count = this.baseMapper.selectCount(queryWrapper);
+        if (count > 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
+        }
+        // 默认密码 zt072433
+        String defaultPassword = "zt072433";
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + defaultPassword).getBytes());
+        user.setUserPassword(encryptPassword);
+        boolean result = this.save(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        return user.getId();
     }
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yixin.interview.annotation.AuthCheck;
@@ -64,9 +65,17 @@ public class QuestionController {
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionAddRequest == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(!StringUtils.isNotBlank(questionAddRequest.getTitle()), ErrorCode.PARAMS_ERROR,  "标题不能为空");
+        questionAddRequest.setTitle(questionAddRequest.getTitle().strip());
+        questionAddRequest.setContent(questionAddRequest.getContent() != null ? questionAddRequest.getContent().strip() : null);
+        questionAddRequest.setAnswer(questionAddRequest.getAnswer() != null ? questionAddRequest.getAnswer().strip() : null);
         // todo 在此处将实体类和 DTO 进行转换
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
+        List<String> tags = questionAddRequest.getTags();
+        if (!tags.isEmpty()) {
+            question.setTags(JSONUtil.toJsonStr(tags));
+        }
         // 数据校验
         questionService.validQuestion(question, true);
         // todo 填充默认值
@@ -120,9 +129,17 @@ public class QuestionController {
         if (questionUpdateRequest == null || questionUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        ThrowUtils.throwIf(!StringUtils.isNotBlank(questionUpdateRequest.getTitle()), ErrorCode.PARAMS_ERROR,  "标题不能为空");
+        questionUpdateRequest.setTitle(questionUpdateRequest.getTitle().strip());
+        questionUpdateRequest.setContent(questionUpdateRequest.getContent() != null ? questionUpdateRequest.getContent().strip() : null);
+        questionUpdateRequest.setAnswer(questionUpdateRequest.getAnswer() != null ? questionUpdateRequest.getAnswer().strip() : null);
         // todo 在此处将实体类和 DTO 进行转换
         Question question = new Question();
         BeanUtils.copyProperties(questionUpdateRequest, question);
+        List<String> tags = questionUpdateRequest.getTags();
+        if (!tags.isEmpty()) {
+            question.setTags(JSONUtil.toJsonStr(tags));
+        }
         // 数据校验
         questionService.validQuestion(question, false);
         // 判断是否存在

@@ -27,7 +27,7 @@ public class UserServiceTest {
             result = userService.userRegister(userAccount, userPassword, checkPassword);
             Assertions.assertEquals(-1, result);
         } catch (Exception e) {
-
+            System.out.println("异常" + e.fillInStackTrace());
         }
     }
 }

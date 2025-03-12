@@ -86,15 +86,19 @@ public class QuestionBankServiceImpl extends ServiceImpl<QuestionBankMapper, Que
         Long userId = questionBankQueryRequest.getUserId();
         String description = questionBankQueryRequest.getDescription();
         String picture = questionBankQueryRequest.getPicture();
+        String title = questionBankQueryRequest.getTitle();
 
         // todo 补充需要的查询条件
         // 从多字段中搜索
-        if (StringUtils.isNotBlank(searchText)) {
+        if (StringUtils.isNotBlank(searchText) && StringUtils.isNotBlank(title)) {
             // 需要拼接查询条件
-            queryWrapper.and(qw -> qw.like("title", searchText).or().like("content", searchText));
+            queryWrapper.and(qw -> qw.like("title", title.strip()).or().like("content", searchText.strip()));
         }
+
+        System.out.println(StringUtils.isNotBlank(description));
         // 模糊查询
-        queryWrapper.like(StringUtils.isNotBlank(description), "description", description);
+        queryWrapper.like(StringUtils.isNotBlank(title), "title", title != null ? title.strip() : null);
+        queryWrapper.like(StringUtils.isNotBlank(description), "description", description != null ? description.strip() : null);
 
         // 精确查询
         queryWrapper.ne(ObjectUtils.isNotEmpty(notId), "id", notId);
@@ -213,5 +217,6 @@ public class QuestionBankServiceImpl extends ServiceImpl<QuestionBankMapper, Que
         questionBankVOPage.setRecords(questionBankVOList);
         return questionBankVOPage;
     }
+
 
 }

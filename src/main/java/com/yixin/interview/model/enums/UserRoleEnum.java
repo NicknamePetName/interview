@@ -11,9 +11,10 @@ import org.apache.commons.lang3.ObjectUtils;
  */
 public enum UserRoleEnum {
 
-    USER("用户", "user"),
-    ADMIN("管理员", "admin"),
-    BAN("被封号", "ban");
+    USER("用户", "USER"),
+    ADMIN("管理员", "ADMIN"),
+    VIP("会员", "VIP"),
+    BAN("被封号", "BAN");
 
     private final String text;
 

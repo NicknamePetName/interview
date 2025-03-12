@@ -1,5 +1,6 @@
 package com.yixin.interview.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yixin.interview.annotation.AuthCheck;
 import com.yixin.interview.common.BaseResponse;
@@ -168,15 +169,8 @@ public class UserController {
         if (userAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User user = new User();
-        BeanUtils.copyProperties(userAddRequest, user);
-        // 默认密码 12345678
-        String defaultPassword = "12345678";
-        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + defaultPassword).getBytes());
-        user.setUserPassword(encryptPassword);
-        boolean result = userService.save(user);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        return ResultUtils.success(user.getId());
+        Long userId = userService.userAdd(userAddRequest);
+        return ResultUtils.success(userId);
     }
 
     /**
@@ -210,6 +204,9 @@ public class UserController {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        userUpdateRequest.setUserName(userUpdateRequest.getUserName() != null ? userUpdateRequest.getUserName().strip(): null);
+        userUpdateRequest.setUserAvatar(userUpdateRequest.getUserAvatar() != null ? userUpdateRequest.getUserAvatar().strip() : null);
+        userUpdateRequest.setUserProfile(userUpdateRequest.getUserProfile() != null ? userUpdateRequest.getUserProfile().strip() : null);
         User user = new User();
         BeanUtils.copyProperties(userUpdateRequest, user);
         boolean result = userService.updateById(user);

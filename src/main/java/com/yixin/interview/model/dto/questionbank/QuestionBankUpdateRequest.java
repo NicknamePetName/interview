@@ -18,6 +18,11 @@ public class QuestionBankUpdateRequest implements Serializable {
     private Long id;
 
     /**
+     * 标题
+     */
+    private String title;
+
+    /**
      * 描述
      */
     private String description;

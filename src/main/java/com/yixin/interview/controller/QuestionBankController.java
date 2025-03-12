@@ -22,6 +22,7 @@ import com.yixin.interview.service.QuestionBankService;
 import com.yixin.interview.service.QuestionService;
 import com.yixin.interview.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +60,10 @@ public class QuestionBankController {
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestionBank(@RequestBody QuestionBankAddRequest questionBankAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionBankAddRequest == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(!StringUtils.isNotBlank(questionBankAddRequest.getTitle()), ErrorCode.PARAMS_ERROR, "标题不能为空");
+        questionBankAddRequest.setTitle(questionBankAddRequest.getTitle().strip());
+        questionBankAddRequest.setDescription(questionBankAddRequest.getDescription() != null ? questionBankAddRequest.getDescription().strip() : null);
+        questionBankAddRequest.setPicture(questionBankAddRequest.getPicture() != null ? questionBankAddRequest.getPicture().strip() : null);
         // todo 在此处将实体类和 DTO 进行转换
         QuestionBank questionBank = new QuestionBank();
         BeanUtils.copyProperties(questionBankAddRequest, questionBank);
@@ -115,6 +120,10 @@ public class QuestionBankController {
         if (questionBankUpdateRequest == null || questionBankUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        ThrowUtils.throwIf(!StringUtils.isNotBlank(questionBankUpdateRequest.getTitle()), ErrorCode.PARAMS_ERROR, "标题不能为空");
+        questionBankUpdateRequest.setTitle(questionBankUpdateRequest.getTitle().strip());
+        questionBankUpdateRequest.setDescription(questionBankUpdateRequest.getDescription() != null ? questionBankUpdateRequest.getDescription().strip() : null);
+        questionBankUpdateRequest.setPicture(questionBankUpdateRequest.getPicture() != null ? questionBankUpdateRequest.getPicture().strip() : null);
         // todo 在此处将实体类和 DTO 进行转换
         QuestionBank questionBank = new QuestionBank();
         BeanUtils.copyProperties(questionBankUpdateRequest, questionBank);

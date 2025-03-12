@@ -2,6 +2,7 @@ package com.yixin.interview.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yixin.interview.model.dto.user.UserAddRequest;
 import com.yixin.interview.model.dto.user.UserQueryRequest;
 import com.yixin.interview.model.entity.User;
 import com.yixin.interview.model.vo.LoginUserVO;
@@ -116,4 +117,5 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
+    Long userAdd(UserAddRequest userAddRequest);
 }

@@ -58,7 +58,7 @@ public class User implements Serializable {
     private String userProfile;
 
     /**
-     * 用户角色：user/admin/vip/ban
+     * 用户角色：USER/ADMIN/VIP/BAN
      */
     private String userRole;
 
