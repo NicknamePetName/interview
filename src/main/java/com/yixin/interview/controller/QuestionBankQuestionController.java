@@ -218,8 +218,8 @@ public class QuestionBankQuestionController {
         Long questionId = questionBankQuestionRemoveRequest.getQuestionId();
 
         LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
-                .eq(QuestionBankQuestion::getId, questionBankId)
-                .eq(QuestionBankQuestion::getId, questionId);
+                .eq(QuestionBankQuestion::getQuestionBankId, questionBankId)
+                .eq(QuestionBankQuestion::getQuestionId, questionId);
         boolean result = questionBankQuestionService.remove(lambdaQueryWrapper);
         return ResultUtils.success(result);
     }
