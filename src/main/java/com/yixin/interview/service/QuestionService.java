@@ -3,7 +3,6 @@ package com.yixin.interview.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yixin.interview.common.BaseResponse;
 import com.yixin.interview.model.dto.question.QuestionQueryRequest;
 import com.yixin.interview.model.entity.Question;
 import com.yixin.interview.model.vo.QuestionVO;
@@ -58,4 +57,12 @@ public interface QuestionService extends IService<Question> {
      */
 
     Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest);
+
+    /**
+     * 从 ES 查询 题目
+     *
+     * @param questionQueryRequest
+     * @return
+     */
+    Page<Question> searchFromEs(QuestionQueryRequest questionQueryRequest);
 }

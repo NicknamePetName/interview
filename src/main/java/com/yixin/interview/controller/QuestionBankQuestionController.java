@@ -11,11 +11,8 @@ import com.yixin.interview.common.ResultUtils;
 import com.yixin.interview.constant.UserConstant;
 import com.yixin.interview.exception.BusinessException;
 import com.yixin.interview.exception.ThrowUtils;
-import com.yixin.interview.model.dto.questionbankquestion.QuestionBankQuestionAddRequest;
+import com.yixin.interview.model.dto.questionbankquestion.*;
 //import com.yixin.interview.model.dto.questionbankquestion.QuestionBankQuestionEditRequest;
-import com.yixin.interview.model.dto.questionbankquestion.QuestionBankQuestionQueryRequest;
-import com.yixin.interview.model.dto.questionbankquestion.QuestionBankQuestionRemoveRequest;
-import com.yixin.interview.model.dto.questionbankquestion.QuestionBankQuestionUpdateRequest;
 import com.yixin.interview.model.entity.QuestionBankQuestion;
 import com.yixin.interview.model.entity.User;
 import com.yixin.interview.model.vo.QuestionBankQuestionVO;
@@ -27,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 题库题目关联接口
@@ -224,4 +222,23 @@ public class QuestionBankQuestionController {
         return ResultUtils.success(result);
     }
     // endregion
+
+    /**
+     * 批量添加题目到题库 （仅管理员可用）
+     *
+     * @param questionBankQuestionBatchAddRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/add/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchAddQuestionsToBank(@RequestBody QuestionBankQuestionBatchAddRequest questionBankQuestionBatchAddRequest,
+                                                         HttpServletRequest request) {
+        ThrowUtils.throwIf(questionBankQuestionBatchAddRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        List<Long> questionIdList = questionBankQuestionBatchAddRequest.getQuestionIdList();
+        Long questionBankId = questionBankQuestionBatchAddRequest.getQuestionBankId();
+        questionBankQuestionService.batchAddQuestionsToBank(questionIdList, questionBankId, loginUser);
+        return ResultUtils.success(true);
+    }
 }
