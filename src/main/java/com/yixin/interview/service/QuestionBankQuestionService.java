@@ -7,6 +7,7 @@ import com.yixin.interview.model.dto.questionbankquestion.QuestionBankQuestionQu
 import com.yixin.interview.model.entity.QuestionBankQuestion;
 import com.yixin.interview.model.entity.User;
 import com.yixin.interview.model.vo.QuestionBankQuestionVO;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -59,6 +60,14 @@ public interface QuestionBankQuestionService extends IService<QuestionBankQuesti
      * @param loginUser
      */
     void batchAddQuestionsToBank(List<Long> questionIdList, long questionBankId, User loginUser);
+
+    /**
+     * 批量添加题目到题库（事务，仅供内部调用）
+     *
+     * @param questionBankQuestions
+     */
+    @Transactional(rollbackFor = Exception.class)
+    void batchAddQuestionsToBankInner(List<QuestionBankQuestion> questionBankQuestions);
 
     /**
      * 批量从题库移除题目
