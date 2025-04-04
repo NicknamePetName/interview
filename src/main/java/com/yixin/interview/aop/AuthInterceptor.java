@@ -21,8 +21,9 @@ import javax.servlet.http.HttpServletRequest;
  * 权限校验 AOP
  *
  */
-@Aspect
-@Component
+// 使用了 Sa-Token,这里暂时不用 AOP
+//@Aspect
+//@Component
 public class AuthInterceptor {
 
     @Resource
