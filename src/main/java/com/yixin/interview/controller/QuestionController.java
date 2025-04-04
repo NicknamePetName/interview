@@ -214,7 +214,7 @@ public class QuestionController {
             // 封号
             User updateUser = new User();
             updateUser.setId(loginUserId);
-            updateUser.setUserRole("ban");
+            updateUser.setUserRole("BAN");
             userService.updateById(updateUser);
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "访问次数过多，已被封号");
         }
