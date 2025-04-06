@@ -12,6 +12,11 @@
             <result property="mpOpenId" column="mpOpenId" jdbcType="VARCHAR"/>
             <result property="userName" column="userName" jdbcType="VARCHAR"/>
             <result property="userAvatar" column="userAvatar" jdbcType="VARCHAR"/>
+            <result property="phoneNumber" column="phoneNumber" jdbcType="VARCHAR"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
+            <result property="grade" column="grade" jdbcType="VARCHAR"/>
+            <result property="expertiseDirection" column="expertiseDirection" jdbcType="VARCHAR"/>
+            <result property="workExperience" column="workExperience" jdbcType="VARCHAR"/>
             <result property="userProfile" column="userProfile" jdbcType="VARCHAR"/>
             <result property="userRole" column="userRole" jdbcType="VARCHAR"/>
             <result property="vipExpireTime" column="vipExpireTime" jdbcType="TIMESTAMP"/>
@@ -26,9 +31,10 @@
     <sql id="Base_Column_List">
         id,userAccount,userPassword,
         unionId,mpOpenId,userName,
-        userAvatar,userProfile,userRole,
-        vipExpireTime,vipCode,vipNumber,
-        editTime,createTime,updateTime,
-        isDelete
+        userAvatar,phoneNumber,email,
+        grade,expertiseDirection,workExperience,
+        userProfile,userRole,vipExpireTime,
+        vipCode,vipNumber,editTime,
+        createTime,updateTime,isDelete
     </sql>
 </mapper>

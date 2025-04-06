@@ -3,6 +3,7 @@ package com.yixin.interview.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.EntryType;
@@ -193,6 +194,7 @@ public class QuestionController {
         return ResultUtils.success(questionVO);
     }
 
+
     /**
      * 检测爬虫
      *
@@ -200,9 +202,9 @@ public class QuestionController {
      */
     private void crawlerDetect(long loginUserId) {
         // 调用多少次时告警
-        final int WARN_COUNT = 10;
+        final int WARN_COUNT = 15;
         // 调用多少次时封号
-        final int BAN_COUNT = 20;
+        final int BAN_COUNT = 30;
         // 拼接访问 key
         String key = String.format("user:access:%s", loginUserId);
         // 统计一分钟内访问次数，180 秒过期
@@ -386,7 +388,7 @@ public class QuestionController {
         try {
             questionPage = questionService.searchFromEs(questionQueryRequest);
         }catch (Exception e){
-            return this.listQuestionVOByPage(questionQueryRequest,request);
+            return this.listQuestionVOByPageSentinel(questionQueryRequest,request);
         }
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
@@ -396,6 +398,30 @@ public class QuestionController {
     public BaseResponse<Boolean> batchDeleteQuestions(@RequestBody QuestionBatchDeleteRequest questionBatchDeleteRequest) {
         ThrowUtils.throwIf(questionBatchDeleteRequest == null, ErrorCode.PARAMS_ERROR);
         questionService.batchDeleteQuestions(questionBatchDeleteRequest.getQuestionIdList());
+        return ResultUtils.success(true);
+    }
+
+
+    /**
+     * AI 生成题目（仅管理员可用）
+     *
+     * @param questionAIGenerateRequest 请求参数
+     * @param request HTTP 请求
+     * @return 是否生成成功
+     */
+    @PostMapping("/ai/generate/question")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> aiGenerateQuestions(@RequestBody QuestionAIGenerateRequest questionAIGenerateRequest, HttpServletRequest request) {
+        String questionType = questionAIGenerateRequest.getQuestionType();
+        int number = questionAIGenerateRequest.getNumber();
+        // 校验参数
+        ThrowUtils.throwIf(StrUtil.isBlank(questionType), ErrorCode.PARAMS_ERROR, "题目类型不能为空");
+        ThrowUtils.throwIf(number <= 0, ErrorCode.PARAMS_ERROR, "题目数量必须大于 0");
+        // 获取当前登录用户
+        User loginUser = userService.getLoginUser(request);
+        // 调用 AI 生成题目服务
+        questionService.aiGenerateQuestions(questionType, number, loginUser);
+        // 返回结果
         return ResultUtils.success(true);
     }
 }

@@ -190,3 +190,10 @@ CREATE TABLE `user`  (
 -- ----------------------------
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+ALTER TABLE user
+    ADD phoneNumber VARCHAR(20) COMMENT '手机号',
+    ADD email VARCHAR(256) COMMENT '邮箱',
+    ADD grade VARCHAR(50) COMMENT '年级',
+    ADD workExperience VARCHAR(512) COMMENT '工作经验',
+    ADD expertiseDirection VARCHAR(512) COMMENT '擅长方向';

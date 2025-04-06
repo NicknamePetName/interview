@@ -36,6 +36,8 @@ import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.yixin.interview.constant.UserConstant.USER_LOGIN_STATE;
+
 /**
  * 用户服务实现
  */
@@ -113,11 +115,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
+        if (user.getUserRole().equals(UserConstant.BAN_ROLE)) {
+            log.info("user login failed, userAccount is BAN");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "您的账号已被封禁，无法访问此资源");
+        }
         // 3. 记录用户的登录态
 //        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
         // 使用 Sa-Token 登录,并指定设备，同端登录互斥
         StpUtil.login(user.getId(), DeviceUtils.getRequestDevice(request));
-        StpUtil.getSession().set(UserConstant.USER_LOGIN_STATE, user);
+        StpUtil.getSession().set(USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
 
@@ -148,7 +154,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 }
             }
             // 记录用户的登录态
-            request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+            request.getSession().setAttribute(USER_LOGIN_STATE, user);
             return getLoginUserVO(user);
         }
     }
@@ -192,7 +198,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getLoginUserPermitNull(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             return null;
@@ -211,7 +217,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
-        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        // 基于 Sa-Token 改造
+        Object userObj = StpUtil.getSession().get(USER_LOGIN_STATE);
+//        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
         return isAdmin(user);
     }
