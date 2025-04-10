@@ -1,4 +1,7 @@
 {
+  "aliases": {
+    "question": {}
+  },
   "mappings": {
     "properties": {
       "title": {
@@ -27,6 +30,9 @@
       },
       "userId": {
         "type": "long"
+      },
+      "reviewStatus": {
+        "type": "keyword"
       },
       "editTime": {
         "type": "date",

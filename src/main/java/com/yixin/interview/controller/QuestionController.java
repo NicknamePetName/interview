@@ -269,6 +269,7 @@ public class QuestionController {
      * @param request
      * @return
      */
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     @PostMapping("/list/page/vo/sentinel")
     public BaseResponse<Page<QuestionVO>> listQuestionVOByPageSentinel(@RequestBody QuestionQueryRequest questionQueryRequest,
                                                                        HttpServletRequest request) {
@@ -284,6 +285,49 @@ public class QuestionController {
             // 被保护的业务逻辑
             // 查询数据库
             Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
+            // 获取封装类
+            return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
+        } catch (Throwable ex) {
+            // 业务异常
+            if (!BlockException.isBlockException(ex)) {
+                Tracer.trace(ex);
+                return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "系统错误");
+            }
+            // 降级操作
+            if (ex instanceof DegradeException) {
+                return handleFallback(questionQueryRequest, request, ex);
+            }
+            // 限流操作
+            return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "访问过于频繁，请稍后再试");
+        } finally {
+            if (entry != null) {
+                entry.exit(1, remoteAddr);
+            }
+        }
+    }
+
+    /**
+     * 分页获取题目列表（封装类 - 限流版 所有人可用）
+     *
+     * @param questionQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/list/page/vo/sentinel/all")
+    public BaseResponse<Page<QuestionVO>> listQuestionVOByPageSentinelAll(@RequestBody QuestionQueryRequest questionQueryRequest,
+                                                                       HttpServletRequest request) {
+        ThrowUtils.throwIf(questionQueryRequest == null, ErrorCode.PARAMS_ERROR);
+        long size = questionQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        // 基于 IP 限流
+        String remoteAddr = request.getRemoteAddr();
+        Entry entry = null;
+        try {
+            entry = SphU.entry(SentinelConstant.listQuestionVOByPageAll, EntryType.IN, 1, remoteAddr);
+            // 被保护的业务逻辑
+            // 查询数据库
+            Page<Question> questionPage = questionService.listQuestionByPageAll(questionQueryRequest);
             // 获取封装类
             return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
         } catch (Throwable ex) {
@@ -388,7 +432,7 @@ public class QuestionController {
         try {
             questionPage = questionService.searchFromEs(questionQueryRequest);
         }catch (Exception e){
-            return this.listQuestionVOByPageSentinel(questionQueryRequest,request);
+            return this.listQuestionVOByPageSentinelAll(questionQueryRequest,request);
         }
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }

@@ -8,19 +8,21 @@ import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * 文件上传业务类型枚举
+ * 模拟面试状态枚举
  *
  */
 @Getter
-public enum FileUploadBizEnum {
+public enum MockInterviewStatusEnum {
 
-    USER_AVATAR("用户头像", "user_avatar");
+    TO_START("待开始", 0),
+    IN_PROGRESS("进行中", 1),
+    ENDED("已结束", 2);
 
     private final String text;
 
-    private final String value;
+    private final int value;
 
-    FileUploadBizEnum(String text, String value) {
+    MockInterviewStatusEnum(String text, int value) {
         this.text = text;
         this.value = value;
     }
@@ -30,7 +32,7 @@ public enum FileUploadBizEnum {
      *
      * @return
      */
-    public static List<String> getValues() {
+    public static List<Integer> getValues() {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
 
@@ -40,12 +42,12 @@ public enum FileUploadBizEnum {
      * @param value
      * @return
      */
-    public static FileUploadBizEnum getEnumByValue(String value) {
+    public static MockInterviewStatusEnum getEnumByValue(Integer value) {
         if (ObjectUtils.isEmpty(value)) {
             return null;
         }
-        for (FileUploadBizEnum anEnum : FileUploadBizEnum.values()) {
-            if (anEnum.value.equals(value)) {
+        for (MockInterviewStatusEnum anEnum : MockInterviewStatusEnum.values()) {
+            if (anEnum.value == value) {
                 return anEnum;
             }
         }

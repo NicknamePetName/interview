@@ -223,18 +223,15 @@ knife4j:
 #    username: yixin
 #    password: Zt159632
 
-# 知识星球 AI 配置
-yupi:
-  client:
-    access-key: "euo46dudzf3wuyxb0sts0wlhld9u91ec"
-    secret-key: "rbzw6n9h973kkwkisuuzohijh3k6hmbf"
-#    access-key: "svc8x23pm8tkfbe60ktwuu4hvt8t1je8"
-#    secret-key: "ho01lyodww825wumhhq9tkp0khfq6i55"
-#    access-key: "jrgwd0ude01ko9sdi5kwz1oqp3yoitjr"
-#    secret-key: "9u4ao4m6ompwv7n21asvc3b3lf4p2mhl"
-
-
 openai:
   deepseek:
     api:
       key:
+  # 鱼聪明 AI 配置
+  client:
+    access-key: "euo46dudzf3wuyxb0sts0wlhld9u91ec"
+    secret-key: "rbzw6n9h973kkwkisuuzohijh3k6hmbf"
+  #    access-key: "svc8x23pm8tkfbe60ktwuu4hvt8t1je8"
+  #    secret-key: "ho01lyodww825wumhhq9tkp0khfq6i55"
+  #    access-key: "jrgwd0ude01ko9sdi5kwz1oqp3yoitjr"
+  #    secret-key: "9u4ao4m6ompwv7n21asvc3b3lf4p2mhl"

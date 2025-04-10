@@ -1,6 +1,7 @@
 package com.yixin.interview.model.enums;
 
 import cn.hutool.core.util.ObjectUtil;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
  * 审核状态枚举
  *
  */
+@Getter
 public enum ReviewStatusEnum {
 
     REVIEWING("待审核", 0),
@@ -52,11 +54,4 @@ public enum ReviewStatusEnum {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
 
-    public int getValue() {
-        return value;
-    }
-
-    public String getText() {
-        return text;
-    }
 }

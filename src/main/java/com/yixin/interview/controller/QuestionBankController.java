@@ -181,7 +181,7 @@ public class QuestionBankController {
             // 可以按需支持更多的题目搜索参数，比如分页
             questionQueryRequest.setPageSize(questionBankQueryRequest.getPageSize());
             questionQueryRequest.setCurrent(questionBankQueryRequest.getCurrent());
-            Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
+            Page<Question> questionPage = questionService.listQuestionByPageAll(questionQueryRequest);
             Page<QuestionVO> questionVOPage = questionService.getQuestionVOPage(questionPage, request);
             questionBankVO.setQuestionPage(questionVOPage);
         }

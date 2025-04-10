@@ -31,6 +31,7 @@ public class ElasticsearchRestTemplateTest {
         doc.put("tags", "elasticsearch,search");
         doc.put("answer", "Yes");
         doc.put("userId", 1L);
+        doc.put("reviewStatus", 1);
         doc.put("editTime", "2023-09-01 10:00:00");
         doc.put("createTime", "2023-09-01 09:00:00");
         doc.put("updateTime", "2023-09-01 09:10:00");

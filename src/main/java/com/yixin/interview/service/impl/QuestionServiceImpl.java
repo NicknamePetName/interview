@@ -288,11 +288,55 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
             }
         }
 
+        if (questionQueryRequest.getReviewStatus() != null) {
+            queryWrapper.eq("reviewStatus", questionQueryRequest.getReviewStatus());
+        }
 
         // 查询数据库
         Page<Question> questionPage = this.page(new Page<>(current, size), queryWrapper);
         return questionPage;
     }
+
+    /**
+     * 分页获取题目列表（所有人可用）
+     *
+     * @param questionQueryRequest
+     * @return
+     */
+
+    public Page<Question> listQuestionByPageAll(QuestionQueryRequest questionQueryRequest) {
+        long current = questionQueryRequest.getCurrent();
+        long size = questionQueryRequest.getPageSize();
+        questionQueryRequest.setTitle(StringUtils.isNotBlank(questionQueryRequest.getTitle()) ? questionQueryRequest.getTitle().strip() : null);
+        QueryWrapper<Question> queryWrapper = this.getQueryWrapper(questionQueryRequest);
+        // 添加审核状态为“通过”的筛选条件
+        queryWrapper.eq("reviewStatus", 1);
+        // 根据题库查询题目列表接口
+        Long questionBankId = questionQueryRequest.getQuestionBankId();
+        if (questionBankId != null) {
+            // 查询题库内的题目 id
+            LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                    .select(QuestionBankQuestion::getQuestionId)
+                    .eq(QuestionBankQuestion::getQuestionBankId, questionBankId);
+            List<QuestionBankQuestion> questionList = questionBankQuestionService.list(lambdaQueryWrapper);
+            if (CollUtil.isNotEmpty(questionList)) {
+                // 取出题目 id 集合
+                Set<Long> questionIdSet = questionList.stream()
+                        .map(QuestionBankQuestion::getQuestionId)
+                        .collect(Collectors.toSet());
+                // 复用原有题目表的查询条件
+                queryWrapper.in("id", questionIdSet);
+            } else {
+                // 题库为空，则返回空列表
+                return new Page<>(current, size, 0);
+            }
+        }
+
+        // 查询数据库
+        Page<Question> questionPage = this.page(new Page<>(current, size), queryWrapper);
+        return questionPage;
+    }
+
 
     /**
      * 从 ES 查询 题目
@@ -319,6 +363,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         // 过滤
         boolQueryBuilder.filter(QueryBuilders.termQuery("isDelete", 0));
+        boolQueryBuilder.filter(QueryBuilders.termQuery("reviewStatus", 1));
         if (id != null) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("id", id));
         }

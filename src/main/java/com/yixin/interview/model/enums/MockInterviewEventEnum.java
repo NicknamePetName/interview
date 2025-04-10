@@ -8,25 +8,26 @@ import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * 文件上传业务类型枚举
+ * 事件类型枚举
  *
  */
 @Getter
-public enum FileUploadBizEnum {
+public enum MockInterviewEventEnum {
 
-    USER_AVATAR("用户头像", "user_avatar");
+    START("开始", "start"),
+    CHAT("聊天", "chat"),
+    END("结束", "end");
 
-    private final String text;
+    private final String text; // 事件描述
+    private final String value; // 事件值
 
-    private final String value;
-
-    FileUploadBizEnum(String text, String value) {
+    MockInterviewEventEnum(String text, String value) {
         this.text = text;
         this.value = value;
     }
 
     /**
-     * 获取值列表
+     * 获取所有事件的值列表
      *
      * @return
      */
@@ -40,11 +41,11 @@ public enum FileUploadBizEnum {
      * @param value
      * @return
      */
-    public static FileUploadBizEnum getEnumByValue(String value) {
+    public static MockInterviewEventEnum getEnumByValue(String value) {
         if (ObjectUtils.isEmpty(value)) {
             return null;
         }
-        for (FileUploadBizEnum anEnum : FileUploadBizEnum.values()) {
+        for (MockInterviewEventEnum anEnum : MockInterviewEventEnum.values()) {
             if (anEnum.value.equals(value)) {
                 return anEnum;
             }
